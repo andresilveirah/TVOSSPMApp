@@ -9,6 +9,11 @@ import UIKit
 import ConsentViewControllerTvOS
 
 class ViewController: UIViewController {
+
+    /**
+     This uses a "wrapper" around `SPConsentManager`. That wrapper behaves exactly like the original class
+     but, has code to at runtime define the bundle where tvOS should look for the VCs XIBs.
+     */
     lazy var consentManager: SPSDK = { SPConsentManagerTvOS(
         accountId: 22,
         propertyId: 17935,
@@ -17,21 +22,19 @@ class ViewController: UIViewController {
         delegate: self
     ) }()
 
+    /**
+     This uses the "original" `SPConsentManager`, without that wrapping logic mentioned above.
+     */
+//    lazy var consentManager: SPSDK = { SPConsentManager(
+//        accountId: 22,
+//        propertyId: 17935,
+//        propertyName: try! SPPropertyName("appletv.demo"),
+//        campaigns: SPCampaigns(gdpr: SPCampaign()),
+//        delegate: self
+//    ) }()
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        let bundle = Bundle(for: SPConsentManagerTvOS.self)
-
-        let frameworkBundle = Bundle(for: SPConsentManagerTvOS.self)
-        let url = frameworkBundle.url(forResource: "ConsentViewController_ConsentViewControllerTvOS", withExtension: "bundle")!
-        let resourceBundle = Bundle(url: url)!
-        if let resourcePath = resourceBundle.resourcePath,
-           let enumerator = FileManager.default.enumerator(atPath: resourcePath) {
-            print("📦 All resources in bundle: \(bundle.bundleURL.lastPathComponent)")
-            for case let file as String in enumerator {
-                print("  • \(file)")
-            }
-        }
-
         consentManager.loadMessage(forAuthId: nil, pubData: nil)
     }
 }
